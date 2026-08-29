@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Project — ProjectPulse</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css" />
+<link rel="stylesheet" href="css/dashboard.css" />
+<link rel="stylesheet" href="css/project.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <div id="shell-sidebar"></div>
+    <div class="main">
+      <div id="shell-topbar"></div>
+      <div class="content">
+
+        <a href="dashboard.html" class="btn btn-ghost btn-sm" style="margin-bottom:10px;">← Back to Dashboard</a>
+
+        <div class="card card-pad" id="projectHeader">
+          <div class="skeleton" style="height:100px;"></div>
+        </div>
+
+        <div class="ptabs" id="projectTabs">
+          <button class="ptab active" data-tab="overview">Overview</button>
+          <button class="ptab" data-tab="tasks">Tasks</button>
+          <button class="ptab" data-tab="milestones">Milestones</button>
+          <button class="ptab" data-tab="issues">Issues</button>
+          <button class="ptab" data-tab="risks">Risks</button>
+          <button class="ptab" data-tab="team">Team</button>
+          <button class="ptab" data-tab="documents">Documents</button>
+          <button class="ptab" data-tab="chat">Chat</button>
+          <button class="ptab" data-tab="reports">Reports</button>
+        </div>
+
+        <!-- OVERVIEW -->
+        <section class="ptab-view" id="ptab-overview">
+          <div class="grid-2col">
+            <div class="card card-pad">
+              <h3 style="margin-bottom:10px; font-size:15px;">Project Health</h3>
+              <div id="healthBreakdown"></div>
+            </div>
+            <div class="card card-pad">
+              <h3 style="margin-bottom:10px; font-size:15px;">Budget</h3>
+              <div id="budgetPanel"></div>
+            </div>
+          </div>
+          <div class="card card-pad" style="margin-top:16px;">
+            <h3 style="margin-bottom:10px; font-size:15px;">Activity Timeline</h3>
+            <div id="projectActivity" style="max-height:320px; overflow-y:auto;"></div>
+          </div>
+        </section>
+
+        <!-- TASKS / KANBAN -->
+        <section class="ptab-view" id="ptab-tasks" style="display:none;">
+          <div class="page-header" style="margin-bottom:14px;">
+            <h1 style="font-size:16px;">Task Board</h1>
+            <button class="btn btn-accent btn-sm" id="addTaskBtn">+ Add Task</button>
+          </div>
+          <div class="kanban" id="kanbanBoard"></div>
+        </section>
+
+        <!-- MILESTONES -->
+        <section class="ptab-view" id="ptab-milestones" style="display:none;">
+          <div class="page-header" style="margin-bottom:14px;">
+            <h1 style="font-size:16px;">Milestones</h1>
+            <button class="btn btn-accent btn-sm" id="addMilestoneBtn">+ Add Milestone</button>
+          </div>
+          <div id="milestoneTimeline" class="card card-pad"></div>
+        </section>
+
+        <!-- ISSUES -->
+        <section class="ptab-view" id="ptab-issues" style="display:none;">
+          <div class="page-header" style="margin-bottom:14px;">
+            <h1 style="font-size:16px;">Issues</h1>
+            <button class="btn btn-accent btn-sm" id="addIssueBtn">+ Report Issue</button>
+          </div>
+          <div class="card" style="overflow-x:auto;">
+            <table><thead><tr><th>Title</th><th>Priority</th><th>Status</th><th>Reported By</th><th>Assigned</th><th></th></tr></thead>
+            <tbody id="issuesTableBody"></tbody></table>
+          </div>
+        </section>
+
+        <!-- RISKS -->
+        <section class="ptab-view" id="ptab-risks" style="display:none;">
+          <div class="page-header" style="margin-bottom:14px;">
+            <h1 style="font-size:16px;">Risk Register</h1>
+            <button class="btn btn-accent btn-sm" id="addRiskBtn">+ Log Risk</button>
+          </div>
+          <div class="card" style="overflow-x:auto;">
+            <table><thead><tr><th>Risk</th><th>Probability</th><th>Impact</th><th>Score</th><th>Level</th><th>Status</th></tr></thead>
+            <tbody id="risksTableBody"></tbody></table>
+          </div>
+        </section>
+
+        <!-- TEAM / WORKLOAD -->
+        <section class="ptab-view" id="ptab-team" style="display:none;">
+          <div class="page-header" style="margin-bottom:14px;">
+            <h1 style="font-size:16px;">Team Workload</h1>
+            <button class="btn btn-outline btn-sm" id="addMemberBtn">+ Add Member</button>
+          </div>
+          <div id="workloadGrid" class="team-grid"></div>
+        </section>
+
+        <!-- DOCUMENTS -->
+        <section class="ptab-view" id="ptab-documents" style="display:none;">
+          <div class="page-header" style="margin-bottom:14px;">
+            <h1 style="font-size:16px;">Documents</h1>
+            <label class="btn btn-accent btn-sm" style="cursor:pointer;">
+              + Upload <input type="file" id="docUploadInput" style="display:none;" />
+            </label>
+          </div>
+          <div id="documentList" class="card"></div>
+        </section>
+
+        <!-- CHAT -->
+        <section class="ptab-view" id="ptab-chat" style="display:none;">
+          <div class="card chat-card">
+            <div class="chat-messages" id="chatMessages"></div>
+            <div class="chat-typing" id="typingIndicator"></div>
+            <form class="chat-input-row" id="chatForm">
+              <input type="text" id="chatInput" placeholder="Message the team…" autocomplete="off" />
+              <button type="submit" class="btn btn-accent btn-sm">Send</button>
+            </form>
+          </div>
+        </section>
+
+        <!-- REPORTS -->
+        <section class="ptab-view" id="ptab-reports" style="display:none;">
+          <div class="grid-2col">
+            <div class="card card-pad">
+              <h3 style="margin-bottom:14px; font-size:15px;">Task Status</h3>
+              <canvas id="taskStatusChart" height="220"></canvas>
+            </div>
+            <div class="card card-pad">
+              <h3 style="margin-bottom:14px; font-size:15px;">Issues by Priority</h3>
+              <canvas id="issuePriorityChart" height="220"></canvas>
+            </div>
+          </div>
+          <div class="grid-2col" style="margin-top:16px;">
+            <div class="card card-pad">
+              <h3 style="margin-bottom:14px; font-size:15px;">Risk Distribution</h3>
+              <canvas id="riskDistChart" height="220"></canvas>
+            </div>
+            <div class="card card-pad">
+              <h3 style="margin-bottom:14px; font-size:15px;">Team Performance</h3>
+              <div id="teamPerfList"></div>
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Task Modal -->
+  <div class="modal-overlay" id="taskModalOverlay" style="display:none;">
+    <div class="modal">
+      <div class="modal-header"><h3>Add Task</h3><button class="btn btn-ghost btn-icon" id="closeTaskModal">✕</button></div>
+      <form id="taskForm">
+        <div class="modal-body">
+          <div class="field"><label>Title</label><input type="text" id="tf_title" required /></div>
+          <div class="field"><label>Description</label><textarea id="tf_description" rows="2"></textarea></div>
+          <div class="field-row">
+            <div class="field"><label>Assigned to</label><select id="tf_assignedTo"></select></div>
+            <div class="field"><label>Priority</label><select id="tf_priority"><option>Low</option><option selected>Medium</option><option>High</option><option>Critical</option></select></div>
+          </div>
+          <div class="field-row">
+            <div class="field"><label>Status</label><select id="tf_status"><option>Backlog</option><option selected>To Do</option><option>In Progress</option><option>Review</option><option>Completed</option><option>Blocked</option></select></div>
+            <div class="field"><label>Due date</label><input type="date" id="tf_dueDate" /></div>
+          </div>
+          <div class="field"><label>Estimated hours</label><input type="number" id="tf_estimatedHours" min="0" value="0" /></div>
+        </div>
+        <div class="modal-footer"><button type="button" class="btn btn-ghost" id="cancelTaskModal">Cancel</button><button type="submit" class="btn btn-accent">Save Task</button></div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Task Detail / Comments Modal -->
+  <div class="modal-overlay" id="taskDetailOverlay" style="display:none;">
+    <div class="modal">
+      <div class="modal-header"><h3 id="td_title">Task</h3><button class="btn btn-ghost btn-icon" id="closeTaskDetail">✕</button></div>
+      <div class="modal-body">
+        <div id="td_meta" style="margin-bottom:14px;"></div>
+        <div class="field"><label>Progress</label>
+          <input type="range" id="td_progress" min="0" max="100" step="10" />
+          <div style="text-align:right; font-size:12px; color:var(--text-400);" id="td_progressLabel">0%</div>
+        </div>
+        <div class="field"><label>Status</label>
+          <select id="td_status"><option>Backlog</option><option>To Do</option><option>In Progress</option><option>Review</option><option>Completed</option><option>Blocked</option></select>
+        </div>
+        <h4 style="font-size:13px; margin:16px 0 8px;">Comments</h4>
+        <div id="td_comments" style="max-height:180px; overflow-y:auto; margin-bottom:10px;"></div>
+        <form id="td_commentForm" style="display:flex; gap:8px;">
+          <input type="text" id="td_commentInput" placeholder="Add a comment…" style="flex:1; padding:9px 12px; border:1px solid var(--border); border-radius:8px;" />
+          <button class="btn btn-accent btn-sm" type="submit">Post</button>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-danger" id="deleteTaskBtn">Delete Task</button>
+        <button class="btn btn-accent" id="saveTaskDetailBtn">Save Changes</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Milestone Modal -->
+  <div class="modal-overlay" id="milestoneModalOverlay" style="display:none;">
+    <div class="modal">
+      <div class="modal-header"><h3>Add Milestone</h3><button class="btn btn-ghost btn-icon" id="closeMilestoneModal">✕</button></div>
+      <form id="milestoneForm">
+        <div class="modal-body">
+          <div class="field"><label>Name</label><input type="text" id="mf_name" required /></div>
+          <div class="field"><label>Description</label><textarea id="mf_description" rows="2"></textarea></div>
+          <div class="field"><label>Due date</label><input type="date" id="mf_dueDate" /></div>
+        </div>
+        <div class="modal-footer"><button type="button" class="btn btn-ghost" id="cancelMilestoneModal">Cancel</button><button type="submit" class="btn btn-accent">Save</button></div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Issue Modal -->
+  <div class="modal-overlay" id="issueModalOverlay" style="display:none;">
+    <div class="modal">
+      <div class="modal-header"><h3>Report Issue</h3><button class="btn btn-ghost btn-icon" id="closeIssueModal">✕</button></div>
+      <form id="issueForm">
+        <div class="modal-body">
+          <div class="field"><label>Title</label><input type="text" id="if_title" required /></div>
+          <div class="field"><label>Description</label><textarea id="if_description" rows="2"></textarea></div>
+          <div class="field-row">
+            <div class="field"><label>Priority</label><select id="if_priority"><option>Low</option><option selected>Medium</option><option>High</option><option>Critical</option></select></div>
+            <div class="field"><label>Assign to</label><select id="if_assignedTo"></select></div>
+          </div>
+        </div>
+        <div class="modal-footer"><button type="button" class="btn btn-ghost" id="cancelIssueModal">Cancel</button><button type="submit" class="btn btn-accent">Report</button></div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Risk Modal -->
+  <div class="modal-overlay" id="riskModalOverlay" style="display:none;">
+    <div class="modal">
+      <div class="modal-header"><h3>Log Risk</h3><button class="btn btn-ghost btn-icon" id="closeRiskModal">✕</button></div>
+      <form id="riskForm">
+        <div class="modal-body">
+          <div class="field"><label>Risk name</label><input type="text" id="rf_name" required /></div>
+          <div class="field"><label>Description</label><textarea id="rf_description" rows="2"></textarea></div>
+          <div class="field-row">
+            <div class="field"><label>Probability (1-5)</label><input type="number" id="rf_probability" min="1" max="5" value="3" /></div>
+            <div class="field"><label>Impact (1-5)</label><input type="number" id="rf_impact" min="1" max="5" value="3" /></div>
+          </div>
+          <div class="field"><label>Mitigation plan</label><textarea id="rf_mitigation" rows="2"></textarea></div>
+        </div>
+        <div class="modal-footer"><button type="button" class="btn btn-ghost" id="cancelRiskModal">Cancel</button><button type="submit" class="btn btn-accent">Save</button></div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Add Member Modal -->
+  <div class="modal-overlay" id="memberModalOverlay" style="display:none;">
+    <div class="modal">
+      <div class="modal-header"><h3>Add Team Member</h3><button class="btn btn-ghost btn-icon" id="closeMemberModal">✕</button></div>
+      <div class="modal-body">
+        <div class="field"><label>Select user</label><select id="mem_userSelect"></select></div>
+      </div>
+      <div class="modal-footer"><button class="btn btn-ghost" id="cancelMemberModal">Cancel</button><button class="btn btn-accent" id="confirmAddMemberBtn">Add</button></div>
+    </div>
+  </div>
+
+  <div id="toast-root"></div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/socket.js"></script>
+  <script src="js/layout.js"></script>
+  <script src="js/project.js"></script>
+</body>
+</html>

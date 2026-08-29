@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Profile — ProjectPulse</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css" />
+<link rel="stylesheet" href="css/dashboard.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <div id="shell-sidebar"></div>
+    <div class="main">
+      <div id="shell-topbar"></div>
+      <div class="content">
+
+        <section class="tab-view">
+          <div class="page-header">
+            <div><h1>Profile & Settings</h1><p>Manage your account, security, and preferences.</p></div>
+          </div>
+
+          <div class="grid-2col" style="align-items:start;">
+            <div class="card card-pad">
+              <h3 style="margin-bottom:16px; font-size:16px;">Account details</h3>
+              <div style="display:flex; align-items:center; gap:14px; margin-bottom:20px;">
+                <div class="avatar avatar-lg" id="profileAvatar">--</div>
+                <div>
+                  <div id="profileName" style="font-weight:700; font-size:16px;"></div>
+                  <div id="profileRole" class="badge badge-violet" style="margin-top:6px; text-transform:capitalize;"></div>
+                </div>
+              </div>
+              <form id="profileForm">
+                <div class="field"><label>Full name</label><input type="text" id="pr_name" required /></div>
+                <div class="field"><label>Email</label><input type="email" id="pr_email" disabled /></div>
+                <div class="field-row">
+                  <div class="field"><label>Phone</label><input type="text" id="pr_phone" /></div>
+                  <div class="field"><label>Department</label><input type="text" id="pr_department" /></div>
+                </div>
+                <button type="submit" class="btn btn-accent">Save changes</button>
+              </form>
+            </div>
+
+            <div class="flex-col" style="gap:20px;">
+              <div class="card card-pad">
+                <h3 style="margin-bottom:14px; font-size:16px;">Security</h3>
+                <p style="font-size:13px; color:var(--text-600); margin-bottom:14px;">Passwords are hashed with bcrypt and never stored in plain text.</p>
+                <form id="passwordForm">
+                  <div class="field"><label>Current password</label><input type="password" id="pw_current" required /></div>
+                  <div class="field"><label>New password</label><input type="password" id="pw_new" minlength="6" required /></div>
+                  <button type="submit" class="btn btn-outline btn-block">Update password</button>
+                </form>
+              </div>
+
+              <div class="card card-pad">
+                <h3 style="margin-bottom:14px; font-size:16px;">Appearance</h3>
+                <div style="display:flex; align-items:center; justify-content:space-between;">
+                  <div>
+                    <div style="font-size:13.5px; font-weight:600;">Theme</div>
+                    <div style="font-size:12px; color:var(--text-400);">Switch between light and dark mode.</div>
+                  </div>
+                  <button class="btn btn-outline btn-sm" id="profileThemeToggle">Toggle</button>
+                </div>
+              </div>
+
+              <div class="card card-pad">
+                <h3 style="margin-bottom:10px; font-size:16px;">Your activity</h3>
+                <div id="profileStats" style="display:flex; gap:18px;">
+                  <div><div style="font-size:22px; font-weight:700;" id="statAssigned">–</div><div style="font-size:12px; color:var(--text-400);">Assigned</div></div>
+                  <div><div style="font-size:22px; font-weight:700;" id="statCompleted">–</div><div style="font-size:12px; color:var(--text-400);">Completed</div></div>
+                  <div><div style="font-size:22px; font-weight:700;" id="statProjects">–</div><div style="font-size:12px; color:var(--text-400);">Projects</div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </div>
+  </div>
+
+  <div id="toast-root"></div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/socket.js"></script>
+  <script src="js/layout.js"></script>
+  <script src="js/profile.js"></script>
+</body>
+</html>

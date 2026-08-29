@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Create account — ProjectPulse</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css" />
+<style>
+  body.auth-body { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: var(--surface-0); padding: 30px; }
+  .register-card { width: 100%; max-width: 520px; padding: 40px 44px; }
+  .register-card .brand { color: var(--ink-900); margin-bottom: 26px; }
+  .register-card .brand svg path { stroke: var(--teal); }
+  .register-card h2 { font-size: 24px; margin-bottom: 6px; }
+  .register-card .lead { color: var(--text-600); font-size: 14px; margin-bottom: 26px; }
+  .strength-bar { height: 4px; background: var(--surface-2); border-radius: 999px; margin-top: 6px; overflow: hidden; }
+  .strength-fill { height: 100%; width: 0%; background: var(--coral); transition: width 0.2s ease, background 0.2s ease; }
+  .signin-link { text-align: center; margin-top: 18px; font-size: 13px; color: var(--text-600); }
+  .signin-link a { color: var(--teal); font-weight: 600; }
+</style>
+</head>
+<body class="auth-body">
+  <div class="card register-card">
+    <div class="brand">
+      <svg class="pulse-mark" viewBox="0 0 60 30"><path d="M0 15 H16 L21 4 L27 26 L33 10 L37 15 H60"/></svg>
+      ProjectPulse
+    </div>
+    <h2>Create your account</h2>
+    <p class="lead">Set up your workspace to plan, track and collaborate.</p>
+
+    <form id="registerForm">
+      <div class="field-row">
+        <div class="field">
+          <label for="name">Full name</label>
+          <input type="text" id="name" required placeholder="Avinash Rao" />
+        </div>
+        <div class="field">
+          <label for="phone">Phone</label>
+          <input type="tel" id="phone" placeholder="+91 90000 00000" />
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="email">Email</label>
+        <input type="email" id="email" required placeholder="you@company.com" />
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label for="department">Department</label>
+          <input type="text" id="department" placeholder="Computer Science" />
+        </div>
+        <div class="field">
+          <label for="role">Role</label>
+          <select id="role">
+            <option value="member">Team Member</option>
+            <option value="manager">Project Manager</option>
+            <option value="viewer">Viewer / Faculty</option>
+            <option value="admin">Admin</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="password">Password</label>
+        <input type="password" id="password" required placeholder="Minimum 6 characters" />
+        <div class="strength-bar"><div class="strength-fill" id="strengthFill"></div></div>
+      </div>
+      <div class="field">
+        <label for="confirmPassword">Confirm password</label>
+        <input type="password" id="confirmPassword" required placeholder="Re-enter password" />
+      </div>
+
+      <button type="submit" class="btn btn-accent" style="width:100%;" id="registerBtn">Create account</button>
+    </form>
+
+    <p class="signin-link">Already have an account? <a href="login.html">Sign in</a></p>
+  </div>
+
+  <div id="toast-root"></div>
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+</body>
+</html>

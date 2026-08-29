@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Dashboard — ProjectPulse</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css" />
+<link rel="stylesheet" href="css/dashboard.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <div id="shell-sidebar"></div>
+    <div class="main">
+      <div id="shell-topbar"></div>
+      <div class="content">
+
+        <!-- OVERVIEW -->
+        <section id="view-overview" class="tab-view">
+          <div class="page-header">
+            <div>
+              <h1 id="greeting">Welcome back</h1>
+              <p>Here's what's happening across your projects today.</p>
+            </div>
+            <button class="btn btn-outline" id="demoDataBtn">Load Demo Data</button>
+          </div>
+
+          <div class="stat-grid" id="statGrid">
+            <div class="card stat-card"><div class="skeleton" style="height:52px;"></div></div>
+            <div class="card stat-card"><div class="skeleton" style="height:52px;"></div></div>
+            <div class="card stat-card"><div class="skeleton" style="height:52px;"></div></div>
+            <div class="card stat-card"><div class="skeleton" style="height:52px;"></div></div>
+          </div>
+
+          <div class="grid-2col">
+            <div class="card card-pad">
+              <h3 style="margin-bottom:14px; font-size:16px;">Task Status Distribution</h3>
+              <canvas id="statusChart" height="220"></canvas>
+            </div>
+            <div class="card card-pad">
+              <h3 style="margin-bottom:14px; font-size:16px;">Recent Activity</h3>
+              <div id="activityFeed" style="max-height:260px; overflow-y:auto;"></div>
+            </div>
+          </div>
+
+          <div class="page-header" style="margin-top:26px;">
+            <h1 style="font-size:18px;">Your Projects</h1>
+            <button class="btn btn-accent btn-sm" id="newProjectBtnOverview">+ New Project</button>
+          </div>
+          <div id="projectGrid" class="project-grid"></div>
+        </section>
+
+        <!-- PROJECTS LIST (full) -->
+        <section id="view-projects" class="tab-view" style="display:none;">
+          <div class="page-header">
+            <div><h1>Projects</h1><p>All projects you can access.</p></div>
+            <div style="display:flex; gap:10px;">
+              <select id="projectStatusFilter" class="btn btn-outline btn-sm" style="padding-right:24px;">
+                <option value="">All statuses</option>
+                <option>Planning</option><option>Active</option><option>On Hold</option>
+                <option>Delayed</option><option>Completed</option><option>Cancelled</option>
+              </select>
+              <button class="btn btn-accent btn-sm" id="newProjectBtnList">+ New Project</button>
+            </div>
+          </div>
+          <div class="card" style="overflow-x:auto;">
+            <table id="projectsTable">
+              <thead><tr>
+                <th>Project</th><th>Manager</th><th>Progress</th><th>Status</th><th>Deadline</th><th>Health</th><th>Team</th><th></th>
+              </tr></thead>
+              <tbody id="projectsTableBody"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- MY TASKS -->
+        <section id="view-mytasks" class="tab-view" style="display:none;">
+          <div class="page-header">
+            <div><h1>My Tasks</h1><p>Tasks assigned to you across all projects.</p></div>
+            <select id="taskStatusFilter" class="btn btn-outline btn-sm">
+              <option value="">All statuses</option>
+              <option>Backlog</option><option>To Do</option><option>In Progress</option>
+              <option>Review</option><option>Completed</option><option>Blocked</option>
+            </select>
+          </div>
+          <div id="myTasksList" class="card"></div>
+        </section>
+
+        <!-- TEAM -->
+        <section id="view-team" class="tab-view" style="display:none;">
+          <div class="page-header"><div><h1>Team</h1><p>Everyone in your workspace.</p></div></div>
+          <div id="teamGrid" class="team-grid"></div>
+        </section>
+
+        <!-- CALENDAR -->
+        <section id="view-calendar" class="tab-view" style="display:none;">
+          <div class="page-header"><div><h1>Calendar</h1><p>Upcoming deadlines and milestones.</p></div></div>
+          <div id="calendarList" class="card"></div>
+        </section>
+
+        <!-- REPORTS -->
+        <section id="view-reports" class="tab-view" style="display:none;">
+          <div class="page-header"><div><h1>Reports & Analytics</h1><p>Portfolio-wide performance.</p></div></div>
+          <div class="grid-2col">
+            <div class="card card-pad">
+              <h3 style="margin-bottom:14px; font-size:16px;">Projects by Status</h3>
+              <canvas id="projectStatusChart" height="220"></canvas>
+            </div>
+            <div class="card card-pad">
+              <h3 style="margin-bottom:14px; font-size:16px;">Projects by Health</h3>
+              <canvas id="healthChart" height="220"></canvas>
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Create Project Modal -->
+  <div class="modal-overlay" id="projectModalOverlay" style="display:none;">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>Create Project</h3>
+        <button class="btn btn-ghost btn-icon" id="closeProjectModal">✕</button>
+      </div>
+      <form id="projectForm">
+        <div class="modal-body">
+          <div class="field"><label>Project name</label><input type="text" id="pf_name" required /></div>
+          <div class="field-row">
+            <div class="field"><label>Project code</label><input type="text" id="pf_code" placeholder="e.g. SCMS-01" /></div>
+            <div class="field"><label>Category</label><input type="text" id="pf_category" placeholder="Web Application" /></div>
+          </div>
+          <div class="field"><label>Description</label><textarea id="pf_description" rows="3"></textarea></div>
+          <div class="field-row">
+            <div class="field"><label>Start date</label><input type="date" id="pf_startDate" /></div>
+            <div class="field"><label>End date</label><input type="date" id="pf_endDate" /></div>
+          </div>
+          <div class="field-row">
+            <div class="field"><label>Budget (₹)</label><input type="number" id="pf_budget" min="0" value="0" /></div>
+            <div class="field"><label>Priority</label>
+              <select id="pf_priority"><option>Low</option><option selected>Medium</option><option>High</option><option>Critical</option></select>
+            </div>
+          </div>
+          <div class="field-row">
+            <div class="field"><label>Status</label>
+              <select id="pf_status"><option selected>Planning</option><option>Active</option><option>On Hold</option><option>Delayed</option><option>Completed</option><option>Cancelled</option></select>
+            </div>
+            <div class="field"><label>Department</label><input type="text" id="pf_department" /></div>
+          </div>
+          <div class="field"><label>Client / Sponsor</label><input type="text" id="pf_client" /></div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-ghost" id="cancelProjectModal">Cancel</button>
+          <button type="submit" class="btn btn-accent" id="submitProjectBtn">Create Project</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="toast-root"></div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/socket.js"></script>
+  <script src="js/layout.js"></script>
+  <script src="js/dashboard.js"></script>
+</body>
+</html>
