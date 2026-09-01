@@ -28,4 +28,12 @@ function authorize(...roles) {
   };
 }
 
-module.exports = { protect, authorize };
+// Blocks the read-only viewer/faculty role from any action that changes data.
+function blockViewer(req, res, next) {
+  if (req.user.role === 'viewer') {
+    return res.status(403).json({ message: 'Forbidden: your account has read-only access' });
+  }
+  next();
+}
+
+module.exports = { protect, authorize, blockViewer };
