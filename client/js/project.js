@@ -13,6 +13,24 @@ let milestones = [];
 let issues = [];
 let risks = [];
 let taskStatusChart, issuePriorityChart, riskDistChart;
+
+// Role gates: managers/admins run the project; members do their assigned work
+// and can still report issues; viewers/faculty are strictly read-only.
+const isManagerOrAdmin = ['manager', 'admin'].includes(user.role);
+const isViewer = user.role === 'viewer';
+
+if (!isManagerOrAdmin) {
+  // Only managers/admins create tasks, milestones, risks, or add members.
+  document.getElementById('addTaskBtn')?.remove();
+  document.getElementById('addMilestoneBtn')?.remove();
+  document.getElementById('addRiskBtn')?.remove();
+  document.getElementById('addMemberBtn')?.remove();
+  document.getElementById('deleteTaskBtn')?.remove();
+}
+if (isViewer) {
+  // Viewers/faculty are read-only: no issue reporting either.
+  document.getElementById('addIssueBtn')?.remove();
+}
 let activeTaskId = null;
 
 const STATUS_COLS = ['Backlog', 'To Do', 'In Progress', 'Review', 'Completed'];
@@ -190,7 +208,7 @@ function taskCardEl(t) {
 }
 
 const taskModal = document.getElementById('taskModalOverlay');
-document.getElementById('addTaskBtn').addEventListener('click', () => (taskModal.style.display = 'flex'));
+document.getElementById('addTaskBtn')?.addEventListener('click', () => (taskModal.style.display = 'flex'));
 document.getElementById('closeTaskModal').addEventListener('click', () => (taskModal.style.display = 'none'));
 document.getElementById('cancelTaskModal').addEventListener('click', () => (taskModal.style.display = 'none'));
 document.getElementById('taskForm').addEventListener('submit', async (e) => {
@@ -249,7 +267,7 @@ document.getElementById('saveTaskDetailBtn').addEventListener('click', async () 
     showToast(err.message, 'error');
   }
 });
-document.getElementById('deleteTaskBtn').addEventListener('click', async () => {
+document.getElementById('deleteTaskBtn')?.addEventListener('click', async () => {
   if (!confirm('Delete this task?')) return;
   try {
     await PPApi.del(`/tasks/${activeTaskId}`);
@@ -348,7 +366,7 @@ function renderMilestones() {
   );
 }
 const milestoneModal = document.getElementById('milestoneModalOverlay');
-document.getElementById('addMilestoneBtn').addEventListener('click', () => (milestoneModal.style.display = 'flex'));
+document.getElementById('addMilestoneBtn')?.addEventListener('click', () => (milestoneModal.style.display = 'flex'));
 document.getElementById('closeMilestoneModal').addEventListener('click', () => (milestoneModal.style.display = 'none'));
 document.getElementById('cancelMilestoneModal').addEventListener('click', () => (milestoneModal.style.display = 'none'));
 document.getElementById('milestoneForm').addEventListener('submit', async (e) => {
@@ -415,7 +433,7 @@ function renderIssues() {
   );
 }
 const issueModal = document.getElementById('issueModalOverlay');
-document.getElementById('addIssueBtn').addEventListener('click', () => (issueModal.style.display = 'flex'));
+document.getElementById('addIssueBtn')?.addEventListener('click', () => (issueModal.style.display = 'flex'));
 document.getElementById('closeIssueModal').addEventListener('click', () => (issueModal.style.display = 'none'));
 document.getElementById('cancelIssueModal').addEventListener('click', () => (issueModal.style.display = 'none'));
 document.getElementById('issueForm').addEventListener('submit', async (e) => {
@@ -481,7 +499,7 @@ function renderRisks() {
   );
 }
 const riskModal = document.getElementById('riskModalOverlay');
-document.getElementById('addRiskBtn').addEventListener('click', () => (riskModal.style.display = 'flex'));
+document.getElementById('addRiskBtn')?.addEventListener('click', () => (riskModal.style.display = 'flex'));
 document.getElementById('closeRiskModal').addEventListener('click', () => (riskModal.style.display = 'none'));
 document.getElementById('cancelRiskModal').addEventListener('click', () => (riskModal.style.display = 'none'));
 document.getElementById('riskForm').addEventListener('submit', async (e) => {
@@ -538,7 +556,7 @@ function renderWorkload() {
     .join('');
 }
 const memberModal = document.getElementById('memberModalOverlay');
-document.getElementById('addMemberBtn').addEventListener('click', async () => {
+document.getElementById('addMemberBtn')?.addEventListener('click', async () => {
   const allUsers = await PPApi.get('/users');
   const existingIds = new Set((project.teamMembers || []).map((m) => m._id));
   const available = allUsers.filter((u) => !existingIds.has(u._id));
