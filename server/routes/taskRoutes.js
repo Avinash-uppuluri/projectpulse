@@ -1,6 +1,6 @@
 const express = require('express');
 const Task = require('../models/Task');
-const { protect } = require('../middleware/authMiddleware');
+const { protect, authorize, blockViewer } = require('../middleware/authMiddleware');
 const { logActivity, notifyUser, recalcProjectProgress } = require('../utils/helpers');
 
 const router = express.Router();
@@ -23,7 +23,7 @@ router.get('/:id', protect, async (req, res) => {
   res.json(task);
 });
 
-router.post('/', protect, async (req, res) => {
+router.post('/', protect, authorize('manager', 'admin'), async (req, res) => {
   try {
     const io = req.app.get('io');
     const task = await Task.create({ ...req.body, createdBy: req.user._id });
@@ -53,11 +53,23 @@ router.post('/', protect, async (req, res) => {
   }
 });
 
-router.put('/:id', protect, async (req, res) => {
+router.put('/:id', protect, blockViewer, async (req, res) => {
   try {
     const io = req.app.get('io');
     const existing = await Task.findById(req.params.id);
     if (!existing) return res.status(404).json({ message: 'Task not found' });
+
+    const isManagerOrAdmin = ['manager', 'admin'].includes(req.user.role);
+    const isAssignedToMe = existing.assignedTo && existing.assignedTo.toString() === req.user._id.toString();
+
+    if (!isManagerOrAdmin && !isAssignedToMe) {
+      return res.status(403).json({ message: 'Forbidden: you can only update tasks assigned to you' });
+    }
+
+    // Only managers/admins are allowed to reassign a task to a different person.
+    if (req.body.assignedTo && !isManagerOrAdmin) {
+      delete req.body.assignedTo;
+    }
 
     const previousStatus = existing.status;
     const previousAssignee = existing.assignedTo ? existing.assignedTo.toString() : null;
@@ -95,7 +107,7 @@ router.put('/:id', protect, async (req, res) => {
   }
 });
 
-router.delete('/:id', protect, async (req, res) => {
+router.delete('/:id', protect, authorize('manager', 'admin'), async (req, res) => {
   const io = req.app.get('io');
   const task = await Task.findByIdAndDelete(req.params.id);
   if (task) {
