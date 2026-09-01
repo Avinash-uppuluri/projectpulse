@@ -9,6 +9,12 @@ let statusChartInstance, projectStatusChartInstance, healthChartInstance;
 
 document.getElementById('greeting').textContent = `Welcome back, ${user.name.split(' ')[0]}`;
 
+// Only managers/admins can create projects — hide the buttons for everyone else.
+if (!['manager', 'admin'].includes(user.role)) {
+  document.getElementById('newProjectBtnOverview')?.remove();
+  document.getElementById('newProjectBtnList')?.remove();
+}
+
 // ---------- Tab routing ----------
 const TABS = {
   '': 'view-overview',
@@ -172,7 +178,7 @@ function renderProjectsTable() {
         <td>${healthPulseSvg(p.health)}</td>
         <td>${(p.teamMembers || []).length}</td>
         <td>
-          ${user.role === 'manager' ? `
+          ${['manager', 'admin'].includes(user.role) ? `
           <button class="btn btn-ghost btn-sm archive-btn" data-id="${p._id}">Archive</button>
           <button class="btn btn-danger btn-sm delete-btn" data-id="${p._id}">Delete</button>
           ` : ''}
