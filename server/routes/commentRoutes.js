@@ -1,6 +1,6 @@
 const express = require('express');
 const Comment = require('../models/Comment');
-const { protect } = require('../middleware/authMiddleware');
+const { protect, blockViewer } = require('../middleware/authMiddleware');
 const { logActivity } = require('../utils/helpers');
 
 const router = express.Router();
@@ -13,7 +13,7 @@ router.get('/', protect, async (req, res) => {
   res.json(comments);
 });
 
-router.post('/', protect, async (req, res) => {
+router.post('/', protect, blockViewer, async (req, res) => {
   const io = req.app.get('io');
   const comment = await Comment.create({ ...req.body, user: req.user._id });
   const populated = await comment.populate('user', 'name avatar');
