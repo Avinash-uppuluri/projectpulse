@@ -1,6 +1,6 @@
 const express = require('express');
 const Risk = require('../models/Risk');
-const { protect } = require('../middleware/authMiddleware');
+const { protect, authorize } = require('../middleware/authMiddleware');
 const { logActivity, recalcProjectHealth } = require('../utils/helpers');
 
 const router = express.Router();
@@ -12,7 +12,7 @@ router.get('/', protect, async (req, res) => {
   res.json(risks);
 });
 
-router.post('/', protect, async (req, res) => {
+router.post('/', protect, authorize('manager', 'admin'), async (req, res) => {
   const io = req.app.get('io');
   const risk = await Risk.create(req.body);
   await logActivity(io, {
@@ -27,7 +27,7 @@ router.post('/', protect, async (req, res) => {
   res.status(201).json(populated);
 });
 
-router.put('/:id', protect, async (req, res) => {
+router.put('/:id', protect, authorize('manager', 'admin'), async (req, res) => {
   const io = req.app.get('io');
   const risk = await Risk.findById(req.params.id);
   if (!risk) return res.status(404).json({ message: 'Risk not found' });
