@@ -1,6 +1,6 @@
 const express = require('express');
 const Issue = require('../models/Issue');
-const { protect } = require('../middleware/authMiddleware');
+const { protect, blockViewer } = require('../middleware/authMiddleware');
 const { logActivity, notifyUser, recalcProjectHealth } = require('../utils/helpers');
 
 const router = express.Router();
@@ -14,7 +14,7 @@ router.get('/', protect, async (req, res) => {
   res.json(issues);
 });
 
-router.post('/', protect, async (req, res) => {
+router.post('/', protect, blockViewer, async (req, res) => {
   const io = req.app.get('io');
   const issue = await Issue.create({ ...req.body, reportedBy: req.user._id });
   await logActivity(io, {
@@ -37,7 +37,7 @@ router.post('/', protect, async (req, res) => {
   res.status(201).json(populated);
 });
 
-router.put('/:id', protect, async (req, res) => {
+router.put('/:id', protect, blockViewer, async (req, res) => {
   const io = req.app.get('io');
   const issue = await Issue.findByIdAndUpdate(req.params.id, req.body, { new: true }).populate(
     'reportedBy assignedTo',
