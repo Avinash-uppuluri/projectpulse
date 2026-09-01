@@ -159,6 +159,21 @@
     </div>
   </div>
 
+  <!-- Team Member Profile Modal (manager only) -->
+  <div class="modal-overlay" id="memberProfileOverlay" style="display:none;">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>Team Member Profile</h3>
+        <button class="btn btn-ghost btn-icon" id="closeMemberProfileModal">✕</button>
+      </div>
+      <div class="modal-body" id="memberProfileBody"></div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-ghost" id="closeMemberProfileModal2">Close</button>
+        <button type="button" class="btn btn-danger" id="deleteMemberBtn">Delete Team Member</button>
+      </div>
+    </div>
+  </div>
+
   <div id="toast-root"></div>
 
   <script src="/socket.io/socket.io.js"></script>
