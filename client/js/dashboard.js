@@ -172,8 +172,10 @@ function renderProjectsTable() {
         <td>${healthPulseSvg(p.health)}</td>
         <td>${(p.teamMembers || []).length}</td>
         <td>
+          ${user.role === 'manager' ? `
           <button class="btn btn-ghost btn-sm archive-btn" data-id="${p._id}">Archive</button>
           <button class="btn btn-danger btn-sm delete-btn" data-id="${p._id}">Delete</button>
+          ` : ''}
         </td>
       </tr>`;
     })
@@ -217,7 +219,6 @@ document.getElementById('projectStatusFilter')?.addEventListener('change', rende
 // ---------- Activity feed ----------
 async function loadActivity() {
   try {
-    // Aggregate: fetch a recent activity slice by pulling from first few projects
     const feed = document.getElementById('activityFeed');
     if (!allProjects.length) {
       feed.innerHTML = `<div class="empty-state"><p>No activity yet.</p></div>`;
