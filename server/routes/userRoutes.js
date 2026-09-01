@@ -1,5 +1,7 @@
 const express = require('express');
 const User = require('../models/User');
+const Project = require('../models/Project');
+const Task = require('../models/Task');
 const { protect, authorize } = require('../middleware/authMiddleware');
 
 const router = express.Router();
@@ -51,6 +53,22 @@ router.put('/:id/block', protect, authorize('admin'), async (req, res) => {
     { new: true }
   ).select('-password');
   res.json(user);
+});
+
+// Only managers can delete a team member's account outright.
+router.delete('/:id', protect, authorize('manager'), async (req, res) => {
+  if (req.params.id === req.user._id.toString()) {
+    return res.status(400).json({ message: 'You cannot delete your own account' });
+  }
+  const user = await User.findByIdAndDelete(req.params.id);
+  if (!user) return res.status(404).json({ message: 'User not found' });
+
+  // Clean up references so the deleted person doesn't linger in team lists
+  // or as an assignee on tasks that still exist.
+  await Project.updateMany({ teamMembers: user._id }, { $pull: { teamMembers: user._id } });
+  await Task.updateMany({ assignedTo: user._id }, { $unset: { assignedTo: '' } });
+
+  res.json({ message: 'Team member deleted' });
 });
 
 module.exports = router;
