@@ -270,28 +270,91 @@ async function loadMyTasks() {
 document.getElementById('taskStatusFilter')?.addEventListener('change', loadMyTasks);
 
 // ---------- Team ----------
+let teamUsersCache = [];
 async function loadTeam() {
   const grid = document.getElementById('teamGrid');
   grid.innerHTML = `<div class="skeleton" style="height:160px;"></div>`;
   try {
     const users = await PPApi.get('/users');
+    teamUsersCache = users;
     grid.innerHTML = users
       .map(
         (u) => `
-      <div class="card team-card">
+      <div class="card team-card" data-id="${u._id}">
         <div class="avatar avatar-lg" style="margin:0 auto 10px;">${initials(u.name)}</div>
         <div style="font-weight:600;">${u.name}</div>
         <div style="font-size:12px; color:var(--text-400); text-transform:capitalize;">${u.role} · ${u.department || '—'}</div>
         <div style="margin-top:10px; font-size:12px;">
           <span class="status-dot ${u.online ? 'online' : 'offline'}"></span>${u.online ? 'Online' : 'Offline'}
         </div>
+        ${user.role === 'manager' ? `
+        <button class="btn btn-outline btn-sm view-profile-btn" data-id="${u._id}" style="margin-top:10px;">View Profile</button>
+        ` : ''}
       </div>`
       )
       .join('');
+
+    grid.querySelectorAll('.view-profile-btn').forEach((btn) =>
+      btn.addEventListener('click', () => openMemberProfile(btn.dataset.id))
+    );
   } catch (err) {
     grid.innerHTML = `<div class="empty-state"><p>${err.message}</p></div>`;
   }
 }
+
+// Manager-only: view a team member's profile and delete their account.
+const memberProfileOverlay = document.getElementById('memberProfileOverlay');
+let activeMemberId = null;
+
+function openMemberProfile(userId) {
+  const m = teamUsersCache.find((u) => u._id === userId);
+  if (!m) return;
+  activeMemberId = userId;
+  document.getElementById('memberProfileBody').innerHTML = `
+    <div style="display:flex; align-items:center; gap:14px; margin-bottom:18px;">
+      <div class="avatar avatar-lg">${initials(m.name)}</div>
+      <div>
+        <div style="font-weight:700; font-size:16px;">${m.name}</div>
+        <div class="badge badge-violet" style="margin-top:4px; text-transform:capitalize;">${m.role}</div>
+      </div>
+    </div>
+    <div class="field-row">
+      <div><div style="font-size:12px; color:var(--text-400);">Email</div><div>${m.email}</div></div>
+      <div><div style="font-size:12px; color:var(--text-400);">Phone</div><div>${m.phone || '—'}</div></div>
+    </div>
+    <div class="field-row" style="margin-top:12px;">
+      <div><div style="font-size:12px; color:var(--text-400);">Department</div><div>${m.department || '—'}</div></div>
+      <div><div style="font-size:12px; color:var(--text-400);">Status</div><div style="text-transform:capitalize;">${m.status}</div></div>
+    </div>
+    <div style="margin-top:12px;"><div style="font-size:12px; color:var(--text-400);">Member since</div><div>${fmtDate(m.createdAt)}</div></div>
+  `;
+  // A manager can't delete their own account through this panel.
+  document.getElementById('deleteMemberBtn').style.display = userId === (user._id || user.id) ? 'none' : '';
+  memberProfileOverlay.style.display = 'flex';
+}
+
+function closeMemberProfile() {
+  memberProfileOverlay.style.display = 'none';
+  activeMemberId = null;
+}
+document.getElementById('closeMemberProfileModal').addEventListener('click', closeMemberProfile);
+document.getElementById('closeMemberProfileModal2').addEventListener('click', closeMemberProfile);
+memberProfileOverlay.addEventListener('click', (e) => {
+  if (e.target === memberProfileOverlay) closeMemberProfile();
+});
+document.getElementById('deleteMemberBtn').addEventListener('click', async () => {
+  if (!activeMemberId) return;
+  const m = teamUsersCache.find((u) => u._id === activeMemberId);
+  if (!confirm(`Delete ${m ? m.name : 'this team member'}'s account? This cannot be undone.`)) return;
+  try {
+    await PPApi.del(`/users/${activeMemberId}`);
+    showToast('Team member deleted', 'success');
+    closeMemberProfile();
+    loadTeam();
+  } catch (err) {
+    showToast(err.message, 'error');
+  }
+});
 
 // ---------- Calendar ----------
 async function loadCalendar() {
