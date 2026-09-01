@@ -22,7 +22,7 @@ router.get('/:id', protect, async (req, res) => {
   res.json(project);
 });
 
-router.post('/', protect, async (req, res) => {
+router.post('/', protect, authorize('manager', 'admin'), async (req, res) => {
   try {
     const io = req.app.get('io');
     const project = await Project.create({
@@ -44,7 +44,7 @@ router.post('/', protect, async (req, res) => {
   }
 });
 
-router.put('/:id', protect, async (req, res) => {
+router.put('/:id', protect, authorize('manager', 'admin'), async (req, res) => {
   try {
     const io = req.app.get('io');
     const project = await Project.findByIdAndUpdate(req.params.id, req.body, { new: true }).populate(
@@ -61,7 +61,7 @@ router.put('/:id', protect, async (req, res) => {
   }
 });
 
-router.delete('/:id', protect, authorize('manager'), async (req, res) => {
+router.delete('/:id', protect, authorize('manager', 'admin'), async (req, res) => {
   const io = req.app.get('io');
   await Project.findByIdAndDelete(req.params.id);
   await Task.deleteMany({ project: req.params.id });
@@ -69,12 +69,12 @@ router.delete('/:id', protect, authorize('manager'), async (req, res) => {
   res.json({ message: 'Project deleted' });
 });
 
-router.put('/:id/archive', protect, authorize('manager'), async (req, res) => {
+router.put('/:id/archive', protect, authorize('manager', 'admin'), async (req, res) => {
   const project = await Project.findByIdAndUpdate(req.params.id, { archived: true }, { new: true });
   res.json(project);
 });
 
-router.post('/:id/members', protect, async (req, res) => {
+router.post('/:id/members', protect, authorize('manager', 'admin'), async (req, res) => {
   const io = req.app.get('io');
   const project = await Project.findByIdAndUpdate(
     req.params.id,
