@@ -79,7 +79,7 @@ function renderShell(activeHref) {
           ${icon('bell')}
           <span class="nav-badge" id="notifCount" style="position:absolute; top:2px; right:2px; display:none;">0</span>
         </button>
-        <button class="btn btn-accent btn-sm" id="quickCreateBtn">${icon('plus')} New Project</button>
+        ${['manager', 'admin'].includes(user.role) ? `<button class="btn btn-accent btn-sm" id="quickCreateBtn">${icon('plus')} New Project</button>` : ''}
       </div>
     </div>
     <div id="notifPanel" class="card" style="display:none; position:absolute; right:24px; top:60px; width:340px; max-height:420px; overflow-y:auto; z-index:100;"></div>
@@ -110,7 +110,7 @@ function renderShell(activeHref) {
     document.getElementById('sidebar').classList.toggle('open');
   });
 
-  document.getElementById('quickCreateBtn').addEventListener('click', () => {
+  document.getElementById('quickCreateBtn')?.addEventListener('click', () => {
     document.dispatchEvent(new Event('pp:createProject'));
   });
 
