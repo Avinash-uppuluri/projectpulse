@@ -1,7 +1,7 @@
 const express = require('express');
 const Project = require('../models/Project');
 const Task = require('../models/Task');
-const { protect } = require('../middleware/authMiddleware');
+const { protect, authorize } = require('../middleware/authMiddleware');
 const { logActivity, recalcProjectHealth } = require('../utils/helpers');
 
 const router = express.Router();
@@ -61,7 +61,7 @@ router.put('/:id', protect, async (req, res) => {
   }
 });
 
-router.delete('/:id', protect, async (req, res) => {
+router.delete('/:id', protect, authorize('manager'), async (req, res) => {
   const io = req.app.get('io');
   await Project.findByIdAndDelete(req.params.id);
   await Task.deleteMany({ project: req.params.id });
@@ -69,7 +69,7 @@ router.delete('/:id', protect, async (req, res) => {
   res.json({ message: 'Project deleted' });
 });
 
-router.put('/:id/archive', protect, async (req, res) => {
+router.put('/:id/archive', protect, authorize('manager'), async (req, res) => {
   const project = await Project.findByIdAndUpdate(req.params.id, { archived: true }, { new: true });
   res.json(project);
 });
